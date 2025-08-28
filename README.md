@@ -19,7 +19,7 @@ Bellabeat data analysis of usage patterns and user retention with data from Fitb
 - **Retention**: 'Low Activity' has the lowest retention (62.5% after 30 days).
 
 ### Visualizations
-- usage patterns: ![Main Results](visualizations/main_results.png)
+- usage patterns (sleep): ![Sleep by Activity Level](Sleep%20by%20Activity%20Level.png)
 - Activity on workdays:![Day of Week](visualizations/day_of_week_results.png)
 - Correlations: ![Correlations](visualizations/correlations_results.png)
 - Retention: ![Retention](visualizations/retention_results.png)
