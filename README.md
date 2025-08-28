@@ -27,7 +27,7 @@ Bellabeat data analysis of usage patterns and user retention with data from Fitb
 - Retention: ![User Retention](User%20Retention.png)
 
 ## Presentation
-https://docs.google.com/presentation/d/1hgBsWyJEXtg7IqUIITiEqUEjB3RISNTRQqB2jElIrM8/edit?slide=id.p#slide=id.p
+[Bellabeat Case Study](https://docs.google.com/presentation/d/1hgBsWyJEXtg7IqUIITiEqUEjB3RISNTRQqB2jElIrM8/edit?slide=id.p#slide=id.p)
 
 ## Recommentadions
 - Gamification for 'Low Activity' group;
