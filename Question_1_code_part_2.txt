@@ -1,0 +1,49 @@
+-- Creates a table with an analysis of activity by day of the week
+CREATE TABLE `my-first-project-457721.Bellabeat_Data.day_of_week_results` AS
+-- Defines users activity groups
+WITH UserActivity AS (
+  SELECT
+    Id,
+    AVG(TotalSteps) AS avg_steps,
+    CASE
+      WHEN AVG(TotalSteps) < 5000 THEN 'Low Activity'
+      WHEN AVG(TotalSteps) BETWEEN 5000 AND 10000 THEN 'Moderate Activity'
+      ELSE 'High Activity'
+    END AS activity_level
+  FROM
+    `my-first-project-457721.Bellabeat_Data.daily_activity`
+  GROUP BY
+    Id
+),
+-- Analyze steps by day of the week and day type
+DayOfWeekUsage AS (
+  SELECT
+    u.activity_level,
+    EXTRACT(DAYOFWEEK FROM d.ActivityDate) AS day_of_week,
+    CASE
+      WHEN EXTRACT(DAYOFWEEK FROM d.ActivityDate) IN (1, 7) THEN 'Weekend'
+      ELSE 'Weekday'
+    END AS day_type,
+    ROUND(AVG(d.TotalSteps)) AS avg_steps_per_day,
+    COUNT(*) AS activity_records
+  FROM
+    `my-first-project-457721.Bellabeat_Data.daily_activity` d
+  JOIN
+    UserActivity u ON d.Id = u.Id
+  GROUP BY
+    u.activity_level,
+    day_of_week,
+    day_type
+)
+-- Saves the results of an analysis of activity by day of the week
+SELECT
+  activity_level,
+  day_of_week,
+  day_type,
+  avg_steps_per_day,
+  activity_records
+FROM
+  DayOfWeekUsage
+ORDER BY
+  activity_level,
+  day_of_week;

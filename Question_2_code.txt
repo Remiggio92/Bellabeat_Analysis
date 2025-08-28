@@ -1,0 +1,67 @@
+-- Creates table with correlations between steps, sleep and weight
+CREATE TABLE `my-first-project-457721.Bellabeat_Data.correlations_results` AS
+-- Oblicza średnie kroki dla użytkowników
+WITH UserActivity AS (
+  SELECT
+    Id,
+    AVG(TotalSteps) AS avg_steps,
+    CASE
+      WHEN AVG(TotalSteps) < 5000 THEN 'Low Activity'
+      WHEN AVG(TotalSteps) BETWEEN 5000 AND 10000 THEN 'Moderate Activity'
+      ELSE 'High Activity'
+    END AS activity_level
+  FROM
+    `my-first-project-457721.Bellabeat_Data.daily_activity`
+  GROUP BY
+    Id
+),
+-- Calculates users sleep data
+SleepUsage AS (
+  SELECT
+    Id,
+    AVG(TotalMinutesAsleep) AS avg_sleep_minutes
+  FROM
+    `my-first-project-457721.Bellabeat_Data.sleep_day`
+  GROUP BY
+    Id
+),
+-- Calculates weight data with correction for values >200 kg
+WeightUsage AS (
+  SELECT
+    Id,
+    ROUND(AVG(CASE WHEN WeightKg > 200 THEN WeightKg/100 ELSE WeightKg END)) AS avg_weight
+  FROM
+    `my-first-project-457721.Bellabeat_Data.weight_log_info`
+  GROUP BY
+    Id
+),
+-- Connects data for correlations
+CombinedData AS (
+  SELECT
+    a.activity_level,
+    a.avg_steps,
+    s.avg_sleep_minutes,
+    w.avg_weight
+  FROM
+    UserActivity a
+  LEFT JOIN
+    SleepUsage s ON a.Id = s.Id
+  LEFT JOIN
+    WeightUsage w ON a.Id = w.Id
+)
+-- Calculates correlations for groups with minimum 3 users
+SELECT
+  activity_level,
+  COUNT(*) AS user_count,
+  CASE WHEN SUM(CASE WHEN avg_sleep_minutes IS NOT NULL THEN 1 ELSE 0 END) >= 3 
+       THEN ROUND(CORR(avg_steps, avg_sleep_minutes), 2) ELSE NULL END AS corr_steps_sleep,
+  CASE WHEN SUM(CASE WHEN avg_weight IS NOT NULL THEN 1 ELSE 0 END) >= 3 
+       THEN ROUND(CORR(avg_steps, avg_weight), 2) ELSE NULL END AS corr_steps_weight,
+  CASE WHEN SUM(CASE WHEN avg_sleep_minutes IS NOT NULL AND avg_weight IS NOT NULL THEN 1 ELSE 0 END) >= 3 
+       THEN ROUND(CORR(avg_sleep_minutes, avg_weight), 2) ELSE NULL END AS corr_sleep_weight
+FROM
+  CombinedData
+GROUP BY
+  activity_level
+ORDER BY
+  activity_level;

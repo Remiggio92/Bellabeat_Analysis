@@ -1,0 +1,102 @@
+-- Create table `main_results` for main statistics and correlations for activity groups
+CREATE TABLE `my-first-project-457721.Bellabeat_Data.main_results` AS
+-- Define average steps, activity days and intensity for all users
+WITH UserActivity AS (
+  SELECT
+    Id,
+    AVG(TotalSteps) AS avg_steps,
+    COUNT(*) AS activity_days,
+    AVG(VeryActiveMinutes) AS avg_very_active_minutes,
+    AVG(FairlyActiveMinutes) AS avg_fairly_active_minutes,
+    AVG(LightlyActiveMinutes) AS avg_lightly_active_minutes,
+    AVG(SedentaryMinutes) AS avg_sedentary_minutes,
+    CASE
+      WHEN AVG(TotalSteps) < 5000 THEN 'Low Activity'
+      WHEN AVG(TotalSteps) BETWEEN 5000 AND 10000 THEN 'Moderate Activity'
+      ELSE 'High Activity'
+    END AS activity_level
+  FROM
+    `my-first-project-457721.Bellabeat_Data.daily_activity`
+  GROUP BY
+    Id
+),
+-- Count sleep data for all users
+SleepUsage AS (
+  SELECT
+    Id,
+    COUNT(*) AS sleep_records,
+    AVG(TotalMinutesAsleep) AS avg_sleep_minutes
+  FROM
+    `my-first-project-457721.Bellabeat_Data.sleep_day`
+  GROUP BY
+    Id
+),
+-- Count weight data for all users with a weight >200 kgs
+WeightUsage AS (
+  SELECT
+    Id,
+    COUNT(*) AS weight_records,
+    ROUND(AVG(CASE WHEN WeightKg > 200 THEN WeightKg/100 ELSE WeightKg END)) AS avg_weight
+  FROM
+    `my-first-project-457721.Bellabeat_Data.weight_log_info`
+  GROUP BY
+    Id
+),
+-- Calculates regularity: percentage of days with activity in the given period
+Regularity AS (
+  SELECT
+    Id,
+    COUNT(*) AS activity_days,
+    (MAX(ActivityDate) - MIN(ActivityDate)) AS date_range_days,
+    SAFE_DIVIDE(COUNT(*), DATE_DIFF(MAX(ActivityDate), MIN(ActivityDate), DAY) + 1) * 100 AS activity_regularity_percent
+  FROM
+    `my-first-project-457721.Bellabeat_Data.daily_activity`
+  GROUP BY
+    Id
+),
+-- Combine data of activity, sleep, weight and regularity
+MainResults AS (
+  SELECT
+    a.activity_level,
+    COUNT(DISTINCT a.Id) AS user_count,
+    AVG(a.avg_steps) AS avg_steps,
+    AVG(a.activity_days) AS avg_activity_days,
+    AVG(a.avg_very_active_minutes) AS avg_very_active_minutes,
+    AVG(a.avg_fairly_active_minutes) AS avg_fairly_active_minutes,
+    AVG(a.avg_lightly_active_minutes) AS avg_lightly_active_minutes,
+    AVG(a.avg_sedentary_minutes) AS avg_sedentary_minutes,
+    AVG(r.activity_regularity_percent) AS avg_activity_regularity_percent,
+    AVG(s.sleep_records) AS avg_sleep_records,
+    AVG(s.avg_sleep_minutes) AS avg_sleep_minutes,
+    AVG(w.weight_records) AS avg_weight_records,
+    AVG(w.avg_weight) AS avg_weight
+  FROM
+    UserActivity a
+  LEFT JOIN
+    SleepUsage s ON a.Id = s.Id
+  LEFT JOIN
+    WeightUsage w ON a.Id = w.Id
+  LEFT JOIN
+    Regularity r ON a.Id = r.Id
+  GROUP BY
+    a.activity_level
+)
+-- Select statistics and save to new table
+SELECT
+  activity_level,
+  user_count,
+  avg_steps,
+  avg_activity_days,
+  avg_very_active_minutes,
+  avg_fairly_active_minutes,
+  avg_lightly_active_minutes,
+  avg_sedentary_minutes,
+  avg_activity_regularity_percent,
+  avg_sleep_records,
+  avg_sleep_minutes,
+  avg_weight_records,
+  avg_weight
+FROM
+  MainResults
+ORDER BY
+  activity_level;

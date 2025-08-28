@@ -1,0 +1,4 @@
+activity_level,total_users,users_active_7_days,percent_active_7_days,users_active_14_days,percent_active_14_days,users_active_30_days,percent_active_30_days
+High Activity,7,7,100.0,7,100.0,6,85.71
+Low Activity,8,7,87.5,7,87.5,5,62.5
+Moderate Activity,18,18,100.0,18,100.0,13,72.22

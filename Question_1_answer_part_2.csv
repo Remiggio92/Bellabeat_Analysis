@@ -1,0 +1,22 @@
+activity_level,day_of_week,day_type,avg_steps_per_day,activity_records
+High Activity,1,Weekend,11740.0,27
+High Activity,2,Weekday,12972.0,27
+High Activity,3,Weekday,13255.0,34
+High Activity,4,Weekday,12805.0,34
+High Activity,5,Weekday,11550.0,33
+High Activity,6,Weekday,12377.0,28
+High Activity,7,Weekend,12901.0,28
+Low Activity,1,Weekend,2334.0,27
+Low Activity,2,Weekday,2558.0,27
+Low Activity,3,Weekday,3171.0,35
+Low Activity,4,Weekday,2956.0,34
+Low Activity,5,Weekday,2600.0,34
+Low Activity,6,Weekday,3068.0,29
+Low Activity,7,Weekend,3115.0,28
+Moderate Activity,1,Weekend,6850.0,67
+Moderate Activity,2,Weekday,7794.0,66
+Moderate Activity,3,Weekday,8113.0,83
+Moderate Activity,4,Weekday,7293.0,82
+Moderate Activity,5,Weekday,7739.0,80
+Moderate Activity,6,Weekday,7289.0,69
+Moderate Activity,7,Weekend,8272.0,68

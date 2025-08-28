@@ -1,0 +1,35 @@
+-- Creates table with user retention analysis
+CREATE TABLE `my-first-project-457721.Bellabeat_Data.retention_results` AS
+-- Calculates the activity period for users
+WITH UserActivity AS (
+  SELECT
+    Id,
+    MIN(ActivityDate) AS first_date,
+    MAX(ActivityDate) AS last_date,
+    DATE_DIFF(MAX(ActivityDate), MIN(ActivityDate), DAY) + 1 AS active_period_days,
+    CASE
+      WHEN AVG(TotalSteps) < 5000 THEN 'Low Activity'
+      WHEN AVG(TotalSteps) BETWEEN 5000 AND 10000 THEN 'Moderate Activity'
+      ELSE 'High Activity'
+    END AS activity_level
+  FROM
+    `my-first-project-457721.Bellabeat_Data.daily_activity`
+  GROUP BY
+    Id
+)
+-- Calculates retention after 7, 14 and 30 days
+SELECT
+  activity_level,
+  COUNT(DISTINCT Id) AS total_users,
+  COUNT(DISTINCT CASE WHEN active_period_days >= 7 THEN Id END) AS users_active_7_days,
+  ROUND(100.0 * COUNT(DISTINCT CASE WHEN active_period_days >= 7 THEN Id END) / COUNT(DISTINCT Id), 2) AS percent_active_7_days,
+  COUNT(DISTINCT CASE WHEN active_period_days >= 14 THEN Id END) AS users_active_14_days,
+  ROUND(100.0 * COUNT(DISTINCT CASE WHEN active_period_days >= 14 THEN Id END) / COUNT(DISTINCT Id), 2) AS percent_active_14_days,
+  COUNT(DISTINCT CASE WHEN active_period_days >= 30 THEN Id END) AS users_active_30_days,
+  ROUND(100.0 * COUNT(DISTINCT CASE WHEN active_period_days >= 30 THEN Id END) / COUNT(DISTINCT Id), 2) AS percent_active_30_days
+FROM
+  UserActivity
+GROUP BY
+  activity_level
+ORDER BY
+  activity_level;
